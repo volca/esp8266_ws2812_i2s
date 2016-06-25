@@ -166,4 +166,42 @@ void WS2812::show(Pixel_t *pixels)
 
 }
 
+// display the pixels
+void WS2812::show(Pixel_t *pixels, uint16_t leds)
+{
+  uint8_t *buffer;
+  uint8_t pixelbyte;
+  uint8_t gammabyte;
+  uint16_t i,b;
+  uint16_t *i2s_ptr[WS2812_DITHER_NUM];
+
+  buffer = (uint8_t *)pixels;
+
+  // set-up pointers into the i2s-pixel-buffers  
+  for(i=0; i<WS2812_DITHER_NUM; i++)
+  {
+    i2s_ptr[i] = (uint16_t *)i2s_pixels_buffer[i];
+  }
+    
+  // for every pixel in the input-array
+  // - get the pixel value (either R,G, or B)
+  // - for every dithered buffer 
+  //   get the gamma-corrected output value
+  // - and transform into i2s nibble
+  
+  uint16_t rgbBytes = leds * 3;
+  for(b=0; b<rgbBytes; b++)
+  {
+    pixelbyte = *buffer++;
+
+    for(i=0; i<WS2812_DITHER_NUM; i++)
+    {
+      gammabyte = gamma_dither[i][pixelbyte];
+      *(i2s_ptr[i]++) = bitpatterns[ (gammabyte & 0x0f) ];
+      *(i2s_ptr[i]++) = bitpatterns[ (gammabyte>>4) & 0x0f ];
+    }
+  }
+
+}
+
 // end of file

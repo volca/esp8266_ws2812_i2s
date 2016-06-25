@@ -27,6 +27,7 @@ class WS2812
     ~WS2812(void);
     void init(uint16_t num_leds);
     void show(Pixel_t *);
+    void show(Pixel_t *, uint16_t leds);
 
   private:
     uint16_t num_leds;
