@@ -190,13 +190,17 @@ void WS2812::show(Pixel_t *pixels, uint16_t leds)
   // - and transform into i2s nibble
   
   uint16_t rgbBytes = leds * 3;
-  for(b=0; b<rgbBytes; b++)
+  for(b=0; b<NUM_RGB_BYTES; b++)
   {
     pixelbyte = *buffer++;
 
     for(i=0; i<WS2812_DITHER_NUM; i++)
     {
-      gammabyte = gamma_dither[i][pixelbyte];
+      if (b > rgbBytes) {
+          gammabyte = gamma_dither[i][0];
+      } else {
+          gammabyte = gamma_dither[i][pixelbyte];
+      }
       *(i2s_ptr[i]++) = bitpatterns[ (gammabyte & 0x0f) ];
       *(i2s_ptr[i]++) = bitpatterns[ (gammabyte>>4) & 0x0f ];
     }
